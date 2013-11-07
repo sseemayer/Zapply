@@ -9,7 +9,7 @@
 
 	# Move files into subdirectories according to their filename
 	# ex. holiday_01.jpg holiday_02.jpg newyears_01.jpg newyears_02.jpg -> holiday/01.jpg holiday/02.jpg newyears/01.jpg newyears/02.jpg
-	$ za '(*)_(*).jpg' mv '$f $1/$2.jpg'
+	$ za '(*)_(*).jpg' mv '$f' '$1/$2.jpg'
 
 ## Installation
 
