@@ -1,0 +1,59 @@
+#!/bin/zsh
+emulate -RL zsh
+setopt extendedglob
+
+local exename=$0
+local verbose=0
+local pattern repl_name repl_args repl_output files
+typeset -A f_args
+
+function usage {
+	print "Usage: $exename file_glob command_name [command_arg_pattern1] [...]" >&2
+	print ""
+	exit 1
+}
+
+while getopts ":v" opt; do
+	case $opt in
+		v)
+			verbose=1
+			;;
+		\?)
+			print "Unknown argument: -$OPTARG"
+			print ""
+			usage
+			;;
+	esac
+done
+
+if [[ $(($# - $OPTIND)) < 1 ]]; then
+	usage
+fi
+
+shift $((OPTIND-1))
+
+pattern=$1
+shift 1
+
+# command and remaining args to be passed on to command
+repl_args=($@)
+
+files=(${~pattern})
+for f in $files; do
+	[[ -e $f && $f = (#b)${~pattern} ]] || continue
+	set -- "$match[@]"
+
+	arg=${(Xe)repl_args}
+	f_args[$f]=$arg
+done
+
+for f in $files; do
+	exec=$f_args[$f]
+
+	if [[ "$verbose" -gt 0 ]]; then
+		echo $exec
+	fi
+	zsh -c $exec || stat=$?
+done
+
+exit $stat

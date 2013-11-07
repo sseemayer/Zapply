@@ -1,0 +1,27 @@
+.TH man 1 "07 November 2013" ".1" "zapply manual"
+.SH NAME
+za \- Apply a command on multiple files with zsh globbing
+.SH SYNOPSIS
+.B za
+[\fIOPTIONS\fR] \fI'FILENAME_PATTERN'\fR \fI'COMMAND_NAME'\fR [\fIARG_PATTERN\fR]...
+
+.SH DESCRIPTION
+
+.PP
+za takes a set of input files matched by FILENAME_PATTERN and applies COMMAND_NAME on them, substituting special variables in ARG_PATTERNs.
+.SH OPTIONS
+
+.TP
+\fB\-v\fR
+Be verbose; print the assembled command before executing it
+
+.SH EXAMPLES
+.PP
+# display all man pages starting with 'font' and their manpage sections
+.br
+za '/usr/share/man/man*/font(*).(*).gz' echo 'font$1 in section $2'
+
+.SH BUGS
+No known bugs, but please tell me if you find any: http://github.com/sseemayer/zapply
+.SH AUTHOR
+Stefan Seemayer (mail@semicolonsoftware.de)
