@@ -56,8 +56,14 @@ for f in $files; do
 	[[ -e $f && $f = (#b)${~pattern} ]] || continue
 	set -- "$match[@]"
 
-	arg=${(Xe)repl_args}
-	f_args[$f]=$arg
+	arg=()
+	for ((i = 1; i <= $#repl_args; i++ )) do
+		repl=${(Xe)repl_args[i]}
+		arg+=("${(q)repl}")
+	done
+
+	#arg=${(Xe)repl_args}
+	f_args[$f]=${(j: :)arg[*]}
 done
 
 if [[ $cores -gt 1 ]]; then
@@ -82,7 +88,8 @@ else
 		if [[ "$verbose" -gt 0 ]]; then
 			echo $exec
 		fi
-		zsh -c $exec || stat=$?
+
+		zsh -c ${exec} || stat=$?
 	done
 
 fi
