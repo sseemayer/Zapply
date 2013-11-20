@@ -4,8 +4,9 @@ setopt extendedglob
 
 local exename=$0
 local verbose=0
+local cores=1
 local pattern repl_name repl_args repl_output files
-typeset -A f_args
+typeset -A f_args flags
 
 function usage {
 	print "Usage: $exename file_glob command_name [command_arg_pattern1] [...]" >&2
@@ -13,10 +14,13 @@ function usage {
 	exit 1
 }
 
-while getopts ":v" opt; do
+while getopts ":vc:" opt; do
 	case $opt in
 		v)
 			verbose=1
+			;;
+		c)
+			cores=$OPTARG
 			;;
 		\?)
 			print "Unknown argument: -$OPTARG"
@@ -26,8 +30,17 @@ while getopts ":v" opt; do
 	esac
 done
 
-if [[ $(($# - $OPTIND)) < 1 ]]; then
+if [[ $(($# - $OPTIND)) -lt 1 ]]; then
 	usage
+fi
+
+if [[ $cores -gt 1 ]]; then
+
+	# check if parallel is available
+	if [[ ! ( -x $( which parallel ) ) ]]; then 
+		echo "Parallel execution requires GNU parallel to be installed and available as 'parallel'!"
+		exit 1
+	fi
 fi
 
 shift $((OPTIND-1))
@@ -47,13 +60,32 @@ for f in $files; do
 	f_args[$f]=$arg
 done
 
-for f in $files; do
-	exec=$f_args[$f]
+if [[ $cores -gt 1 ]]; then
 
+	flags=()
 	if [[ "$verbose" -gt 0 ]]; then
-		echo $exec
+		flags+='-v'
 	fi
-	zsh -c $exec || stat=$?
-done
+
+	for f in $files; do
+		exec=$f_args[$f];
+		echo $exec
+	done | parallel $flags -j $cores 
+
+	stat=$?
+
+else
+
+	for f in $files; do
+		exec=$f_args[$f]
+
+		if [[ "$verbose" -gt 0 ]]; then
+			echo $exec
+		fi
+		zsh -c $exec || stat=$?
+	done
+
+fi
+
 
 exit $stat

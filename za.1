@@ -15,6 +15,12 @@ za takes a set of input files matched by FILENAME_PATTERN and applies COMMAND_NA
 \fB\-v\fR
 Be verbose; print the assembled command before executing it
 
+.TP
+\fB\-c\fR \fICORES\fR
+Perform the action in parallel on \fICORES\fR cores. 
+
+This setting will be passed on to the GNU parallel \fB-j\fR flag, so you can also specify all other valid formats such as \fI+n\fR, \fI-n\fR or \fIn%\fR. See \fBparallel\fR(1) for details.
+
 .SH EXAMPLES
 .PP
 # display all man pages starting with 'font' and their manpage sections
