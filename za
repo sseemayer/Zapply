@@ -4,6 +4,7 @@ setopt extendedglob
 
 local exename=$0
 local verbose=0
+local progress=0
 local cores=1
 local pattern repl_name repl_args repl_output files
 typeset -A f_args flags
@@ -14,10 +15,13 @@ function usage {
 	exit 1
 }
 
-while getopts ":vc:" opt; do
+while getopts ":vpc:" opt; do
 	case $opt in
 		v)
 			verbose=1
+			;;
+		p)
+			progress=1
 			;;
 		c)
 			cores=$OPTARG
@@ -71,6 +75,10 @@ if [[ $cores -gt 1 ]]; then
 	flags=()
 	if [[ "$verbose" -gt 0 ]]; then
 		flags+='-v'
+	fi
+
+	if [[ "$progress" -gt 0 ]]; then
+		flags+='--bar'
 	fi
 
 	for f in $files; do
